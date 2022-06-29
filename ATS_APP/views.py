@@ -73,10 +73,10 @@ class UserApiView(APIView):
     # function to update the detail of the data found in the database
     def put(self, request):
         queryset = user.objects.get(id=request.data['id'])
+        request.data['password'] = make_password(queryset.password)
         serializer = UserSerializer(queryset, data= request.data)
         try:
             if serializer.is_valid():
-                serializer.data['password'] = make_password(serializer.data['password'])
                 serializer.save()
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
             else:
@@ -84,7 +84,7 @@ class UserApiView(APIView):
                 return Response(serializer.errors, status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(e)
-            return Response(serializer.errors, status=status.HHTP_404_NOT_FOUND)
+            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
 
 # user paginated
@@ -999,9 +999,20 @@ def get_applicant_score(request):
                     candidate.job = job_obj
                     candidate.candidate_user=user_obj
 
+
                     candidate_evaluations.append(candidate)
                     candidate_ser = candidate_EvaluationSerializer(data=candidate)
                     # if candidate.is_valid():
+                    # try:
+                    #     skills_extracted= get_skills(resume_s)
+                    #     skill_set = Skill_Set()
+                    #     skill_set.skill = skills_extracted
+                    #     skill_set.applicant = user_id
+                    #     skill_set.save()
+                    #     print('Saving success')
+                    #     continue
+                    # except Exception as e:
+                    #     print(e)
                     try:
                         candidate.save()
                         print('Saving success')
